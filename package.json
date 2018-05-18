@@ -1,0 +1,19 @@
+{
+   "name": "qraphql-ts-server",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "devDependencies": {
+      "@types/node": "^10.1.0",
+      "ts-node": "6.0.3",
+      "typescript": "2.8.3"
+   },
+   "dependencies": {
+      "graphql-yoga": "^1.13.1",
+      "pg": "^7.4.3",
+      "reflect-metadata": "^0.1.12",
+      "typeorm": "0.2.5"
+   },
+   "scripts": {
+      "start": "ts-node src/index.ts"
+   }
+}
