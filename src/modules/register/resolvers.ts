@@ -4,7 +4,7 @@ import { User } from "../../entity/User";
 
 export const resolvers: ResolverMap = {
   Query: {
-    bye: () => "bye"
+    bye: () => "bye User"
   },
   Mutation: {
     register: async (
