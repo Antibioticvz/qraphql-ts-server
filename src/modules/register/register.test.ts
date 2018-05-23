@@ -17,16 +17,40 @@ const pasword = "test";
 
 const mutation = `
 mutation {
-    register(email: "${email}", password: "${pasword}")
+    register(email: "${email}", password: "${pasword}"){
+      path
+      message
+    }
 }
 `;
 
-test("Rgister User", async () => {
-  const res = await request(getHost, mutation);
-  expect(res).toEqual({ register: true });
+test("Register User Success", async () => {
+  const res: any = await request(getHost, mutation);
+  expect(res).toEqual({ register: null });
   const users = await User.find({ where: { email } });
   expect(users).toHaveLength(1);
   const user = users[0];
   expect(user.email).toEqual(email);
   expect(user.password).not.toEqual(pasword);
+});
+
+test("Register User Reject", async () => {
+  const res: any = await request(getHost, mutation);
+  expect(res.register).toHaveLength(1);
+  expect(res.register[0].path).toEqual("email");
+  expect(res.register[0].message).toEqual("already taken");
+  /* expect(res).toEqual({
+    register: [
+      {
+        path: "email",
+        message: "already taken"
+      }
+    ]
+  }); */
+
+  /* const users = await User.find({ where: { email } });
+  expect(users).toHaveLength(1);
+  const user = users[0];
+  expect(user.email).toEqual(email);
+  expect(user.password).not.toEqual(pasword); */
 });
