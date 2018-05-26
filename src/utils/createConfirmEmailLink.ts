@@ -1,5 +1,5 @@
-import { v4 } from "uuid/v4";
 import { Redis } from "ioredis";
+import * as v4 from "uuid/v4";
 
 export const createConfirmEmailLink = async (
   url: string,

@@ -5,10 +5,10 @@ import { User } from "../../entity/User";
 import { formatYupError } from "../../utils/formatYupError";
 import { createConfirmEmailLink } from "../../utils/createConfirmEmailLink";
 import {
-import { url } from 'inspector';
   emailNotLongEnough,
   invalidEmail,
-  passwordNotLongEnough
+  passwordNotLongEnough,
+  duplicateEmail
 } from "./errorMessages";
 
 const schema = yup.object().shape({
@@ -28,11 +28,14 @@ export const resolvers: ResolverMap = {
     bye: () => "bye User"
   },
   Mutation: {
-    register: async (_, args: GQL.IRegisterOnMutationArguments, { redis, url }) => {
+    register: async (
+      _,
+      args: GQL.IRegisterOnMutationArguments,
+      { redis, url }
+    ) => {
       try {
         await schema.validate(args, { abortEarly: false });
       } catch (err) {
-        // return console.log(err);
         return formatYupError(err);
       }
       const { email, password } = args;
@@ -46,7 +49,7 @@ export const resolvers: ResolverMap = {
         return [
           {
             path: "email",
-            message: "already taken"
+            message: duplicateEmail
           }
         ];
       }
@@ -59,7 +62,7 @@ export const resolvers: ResolverMap = {
 
       await user.save();
 
-      const link = await createConfirmEmailLink(url, user.id, redis);
+      await createConfirmEmailLink(url, user.id, redis);
 
       return null;
     }

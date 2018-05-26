@@ -43,11 +43,27 @@ export const startServer = async () => {
     }
   });
 
-  await createTypeormConn();
+  /* await createTypeormConn();
   const app = await server.start({
     port: process.env.NODE_ENV === "test" ? 0 : 4000
   });
-  console.log("Server is running on localhost:4000");
+  console.log("Server is running on localhost:4000"); */
+
+  await createTypeormConn();
+
+  const serverPort: number = process.env.NODE_ENV === "test" ? 0 : 4000;
+  const options = {
+    port: serverPort
+    // endpoint: "/graphql",
+    // subscriptions: "/subscriptions",
+    // playground: "/playground"
+  };
+
+  const app = await server.start(options, ({ port }) =>
+    console.log(
+      `Server started, listening on port ${port} for incoming requests.`
+    )
+  );
 
   return app;
 };
