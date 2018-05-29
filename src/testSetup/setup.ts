@@ -1,8 +1,9 @@
 import { startServer } from "../startServer";
+import { AddressInfo } from "net";
 
 export const setup = async () => {
   const app = await startServer();
-  const { port } = app.address();
+  const { port } = app.address() as AddressInfo;
 
   // console.log("...........................server>>>>>>");
   // console.log(app.address());
