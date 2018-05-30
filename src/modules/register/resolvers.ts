@@ -62,6 +62,7 @@ export const resolvers: ResolverMap = {
 
       await user.save();
 
+      // ToDo implement an email client to sent a User register link
       await createConfirmEmailLink(url, user.id, redis);
 
       return null;
