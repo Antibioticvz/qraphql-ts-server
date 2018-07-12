@@ -1,16 +1,20 @@
-import { Redis } from "ioredis";
-import { url } from "inspector";
+import { Redis } from "ioredis"
+import { url, Session } from "inspector"
 
-export interface ResolverMap {
+export interface ISession {
+  userId?: string
+}
+export default interface IResolverMap {
   [key: string]: {
     [key: string]: (
       parent: any,
       args: any,
       context: {
-        redis: Redis;
-        url: string;
+        redis: Redis
+        url: string
+        session: ISession
       },
       info: any
-    ) => any;
-  };
+    ) => any
+  }
 }

@@ -1,7 +1,7 @@
 import * as bcrypt from "bcryptjs"
 import * as yup from "yup"
 
-import { ResolverMap } from "../../types/graphql-utils"
+import IResolverMap from "../../types/graphql-utils"
 import { User } from "../../entity/User"
 import { formatYupError } from "../../utils/formatYupError"
 import { createConfirmEmailLink } from "../../utils/createConfirmEmailLink"
@@ -24,7 +24,7 @@ const schema = yup.object().shape({
     .max(255)
 })
 
-export const resolvers: ResolverMap = {
+export const resolvers: IResolverMap = {
   Query: {
     bye: () => "bye User"
   },
