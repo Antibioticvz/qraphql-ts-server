@@ -3,6 +3,7 @@ import { request } from "graphql-request"
 import { User } from "../../entity/User"
 import { invalidLogin, confirmEmailError } from "./errorMessages"
 import { createTypeormConn } from "../../utils/createTypeormConn"
+import { Connection } from "typeorm"
 
 const chance = new Chance()
 
@@ -27,8 +28,12 @@ mutation {
 }
 `
 
+let connection: Connection
 beforeAll(async () => {
-  await createTypeormConn()
+  connection = await createTypeormConn()
+})
+afterAll(async () => {
+  connection.close()
 })
 
 const loginExpectError = async (e: string, p: string, errMsg: string) => {

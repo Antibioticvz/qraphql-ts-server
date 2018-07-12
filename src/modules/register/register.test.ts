@@ -8,6 +8,7 @@ import {
   passwordNotLongEnough
 } from "./errorMessages"
 import { createTypeormConn } from "../../utils/createTypeormConn"
+import { Connection } from "typeorm"
 
 const chance = new Chance()
 
@@ -27,8 +28,12 @@ mutation {
 }
 `
 
+let connection: Connection
 beforeAll(async () => {
-  await createTypeormConn()
+  connection = await createTypeormConn()
+})
+afterAll(async () => {
+  connection.close()
 })
 
 describe("Register User", async () => {
