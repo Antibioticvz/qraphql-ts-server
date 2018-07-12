@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import { GraphQLServer } from "graphql-yoga"
 import { myRedis as redis } from "./redis"
 
