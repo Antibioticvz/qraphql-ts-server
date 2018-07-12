@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@gql2ts/from-schema": "^1.8.0",
+    "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "chance": "^1.0.16",
     "connect-redis": "^3.3.3",

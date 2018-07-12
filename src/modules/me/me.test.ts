@@ -1,23 +1,15 @@
+import axios from "axios"
 import * as Chance from "chance"
-import { request } from "graphql-request"
 import { User } from "../../entity/User"
-import {
-  duplicateEmail,
-  emailNotLongEnough,
-  invalidEmail,
-  passwordNotLongEnough
-} from "./errorMessages"
+
 import { createTypeormConn } from "../../utils/createTypeormConn"
 import { Connection } from "typeorm"
+import async from "./middleware"
 
 const chance = new Chance()
 
 const email = chance.email({ domain: "gmail.com", length: 10 })
-const emailToShort = chance.email({ domain: "d.io", length: 1 })
 const password = chance.string({ length: 10 })
-const passwordToShort = chance.string({ length: 2 })
-const justString = chance.string({ length: 10 })
-const justShortString = chance.string({ length: 1 })
 
 const mutation = (e: string, p: string) => `
 mutation {
@@ -36,8 +28,18 @@ afterAll(async () => {
   connection.close()
 })
 
+describe("Me from cooki", async () => {
+  it("Reject: can't get user if not logged in", async () => {
+    // later
+  })
+
+  it("", async () => {
+    // later
+  })
+})
+
 describe("Register User", async () => {
-  it("Success: make sure we can register a user", async () => {
+  it("c make sure we can register a user", async () => {
     const res = await request(process.env.TEST_HOST as string, mutation(email, password))
     expect(res).toEqual({ register: null })
     const users = await User.find({ where: { email } })
