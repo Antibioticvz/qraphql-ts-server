@@ -62,7 +62,7 @@ describe("Login User", async () => {
     await loginExpectError(email, password, confirmEmailError)
   })
 
-  it("Reject: Check unconfirmed user", async () => {
+  it("Success: Check confirmed user", async () => {
     const users = await User.find({ where: { email } })
     expect(users).toHaveLength(1)
 
