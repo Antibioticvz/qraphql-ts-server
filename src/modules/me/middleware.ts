@@ -1,5 +1,5 @@
 import { Resolver } from "../../types/graphql-utils"
-import logger from "../../utils/logger"
+// import logger from "../../utils/logger"
 
 export default async (resolver: Resolver, parent: any, args: any, context: any, info: any) => {
   // middleware
