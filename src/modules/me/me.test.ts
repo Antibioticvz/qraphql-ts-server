@@ -44,11 +44,15 @@ afterAll(async () => {
 })
 
 describe("Me from cooki", async () => {
-  it("Reject: can't get user if not logged in", async () => {
-    // later
+  it("Reject: can't get user`s self credentials if not logged in", async () => {
+    const response = await axios.post(process.env.TEST_HOST as string, {
+      query: meQuery
+    })
+
+    expect(response.data.data.me).toBeNull()
   })
 
-  it("Success", async () => {
+  it("Success: can get Me credentials", async () => {
     await axios.post(
       process.env.TEST_HOST as string,
       {
