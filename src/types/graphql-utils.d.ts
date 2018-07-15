@@ -1,7 +1,6 @@
 import { Redis } from "ioredis"
-import { url, Session } from "inspector"
 
-export interface ISession {
+export interface ISession extends Express.Session {
   userId?: string
 }
 
