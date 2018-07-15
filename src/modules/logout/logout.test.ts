@@ -1,8 +1,10 @@
 import axios from "axios"
+import { request } from "graphql-request"
 import * as Chance from "chance"
 import { User } from "../../entity/User"
 import { createTypeormConn } from "../../utils/createTypeormConn"
 import { Connection } from "typeorm"
+import { LoneAnonymousOperation } from "graphql/validation/rules/LoneAnonymousOperation"
 
 const chance = new Chance()
 
@@ -29,6 +31,12 @@ const meQuery = `
 }
 `
 
+const logoutMutation = `
+mutation {
+  logout
+}
+`
+
 beforeAll(async () => {
   connection = await createTypeormConn()
 
@@ -38,31 +46,24 @@ beforeAll(async () => {
     confirmed: true
   }).save()
   userId = user.id
+
+  // Login user
+  await axios.post(
+    process.env.TEST_HOST as string,
+    {
+      query: loginMutation(email, password)
+    },
+    {
+      withCredentials: true
+    }
+  )
 })
 afterAll(async () => {
   connection.close()
 })
 
-describe("Me from cooki", async () => {
-  it("Reject: can't get user`s self credentials if not logged in", async () => {
-    const response = await axios.post(process.env.TEST_HOST as string, {
-      query: meQuery
-    })
-
-    expect(response.data.data.me).toBeNull()
-  })
-
-  it("Success: can get Me credentials", async () => {
-    await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: loginMutation(email, password)
-      },
-      {
-        withCredentials: true
-      }
-    )
-
+describe("Logout", async () => {
+  it("Make sure that this user is logged in", async () => {
     const response = await axios.post(
       process.env.TEST_HOST as string,
       {
@@ -79,5 +80,30 @@ describe("Me from cooki", async () => {
         email
       }
     })
+  })
+
+  it("Success: logged out", async () => {
+    await axios.post(
+      process.env.TEST_HOST as string,
+      {
+        query: logoutMutation
+      },
+      {
+        withCredentials: true
+      }
+    )
+
+    const response = await axios.post(
+      process.env.TEST_HOST as string,
+      {
+        query: meQuery
+      },
+      {
+        withCredentials: true
+      }
+    )
+
+    // no cookie anymore
+    expect(response.data.data.me).toBeNull()
   })
 })
