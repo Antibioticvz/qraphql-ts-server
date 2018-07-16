@@ -1,32 +1,17 @@
 import * as Chance from "chance"
-import { request } from "graphql-request"
+import { Connection } from "typeorm"
+
 import { User } from "../../entity/User"
 import { invalidLogin, confirmEmailError } from "./errorMessages"
 import { createTypeormConn } from "../../utils/createTypeormConn"
-import { Connection } from "typeorm"
+import { TestClient } from "../../utils/testClient"
+
+const client = new TestClient(process.env.TEST_HOST as string)
 
 const chance = new Chance()
 
 const email = chance.email({ domain: "gmail.com", length: 10 })
 const password = chance.string({ length: 10 })
-
-const registerMutation = (e: string, p: string) => `
-mutation {
-    register(email: "${e}", password: "${p}"){
-      path
-      message
-    }
-}
-`
-
-const loginMutation = (e: string, p: string) => `
-mutation {
-    login(email: "${e}", password: "${p}"){
-      path
-      message
-    }
-}
-`
 
 let connection: Connection
 beforeAll(async () => {
@@ -37,9 +22,9 @@ afterAll(async () => {
 })
 
 const loginExpectError = async (e: string, p: string, errMsg: string) => {
-  const res = await request(process.env.TEST_HOST as string, loginMutation(e, p))
+  const response = await client.login(e, p)
 
-  expect(res).toEqual({
+  expect(response.data).toEqual({
     login: [
       {
         path: "email",
@@ -55,7 +40,7 @@ describe("Login User", async () => {
   })
 
   it("Reject: Register and check unconfirmed user", async () => {
-    await request(process.env.TEST_HOST as string, registerMutation(email, password))
+    await client.register(email, password)
     const users = await User.find({ where: { email } })
     expect(users).toHaveLength(1)
 
@@ -68,8 +53,8 @@ describe("Login User", async () => {
 
     await User.update({ email }, { confirmed: true })
 
-    const res = await request(process.env.TEST_HOST as string, loginMutation(email, password))
+    const response = await client.login(email, password)
 
-    expect(res).toEqual({ login: null })
+    expect(response.data).toEqual({ login: null })
   })
 })

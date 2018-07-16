@@ -1,10 +1,10 @@
-import axios from "axios"
-import { request } from "graphql-request"
 import * as Chance from "chance"
 import { User } from "../../entity/User"
 import { createTypeormConn } from "../../utils/createTypeormConn"
 import { Connection } from "typeorm"
-import { LoneAnonymousOperation } from "graphql/validation/rules/LoneAnonymousOperation"
+import { TestClient } from "../../utils/TestClient"
+
+const client = new TestClient(process.env.TEST_HOST as string)
 
 const chance = new Chance()
 
@@ -12,30 +12,6 @@ let userId: string
 let connection: Connection
 const email = chance.email({ domain: "gmail.com", length: 10 })
 const password = chance.string({ length: 10 })
-
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`
-
-const meQuery = `
-{
-  me {
-    id
-    email
-  }
-}
-`
-
-const logoutMutation = `
-mutation {
-  logout
-}
-`
 
 beforeAll(async () => {
   connection = await createTypeormConn()
@@ -46,17 +22,6 @@ beforeAll(async () => {
     confirmed: true
   }).save()
   userId = user.id
-
-  // Login user
-  await axios.post(
-    process.env.TEST_HOST as string,
-    {
-      query: loginMutation(email, password)
-    },
-    {
-      withCredentials: true
-    }
-  )
 })
 afterAll(async () => {
   connection.close()
@@ -64,17 +29,11 @@ afterAll(async () => {
 
 describe("Logout", async () => {
   it("Make sure that this user is logged in", async () => {
-    const response = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: meQuery
-      },
-      {
-        withCredentials: true
-      }
-    )
+    await client.login(email, password)
 
-    expect(response.data.data).toEqual({
+    const response = await client.me()
+
+    expect(response.data).toEqual({
       me: {
         id: userId,
         email
@@ -83,27 +42,10 @@ describe("Logout", async () => {
   })
 
   it("Success: logged out", async () => {
-    await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: logoutMutation
-      },
-      {
-        withCredentials: true
-      }
-    )
+    await client.logout()
 
-    const response = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: meQuery
-      },
-      {
-        withCredentials: true
-      }
-    )
+    const response2 = await client.me()
 
-    // no cookie anymore
-    expect(response.data.data.me).toBeNull()
+    expect(response2.data.me).toBeNull()
   })
 })
