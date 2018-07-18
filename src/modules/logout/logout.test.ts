@@ -41,11 +41,11 @@ describe("Logout", async () => {
     })
   })
 
-  it("Success: logged out", async () => {
+  it("Success: single session logged out", async () => {
     await client.logout()
 
-    const response2 = await client.me()
+    const response = await client.me()
 
-    expect(response2.data.me).toBeNull()
+    expect(response.data.me).toBeNull()
   })
 })
