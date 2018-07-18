@@ -3,6 +3,7 @@ import * as bcrypt from "bcryptjs"
 import IResolverMap from "../../types/graphql-utils"
 import { User } from "../../entity/User"
 import { invalidLogin, confirmEmailError } from "./errorMessages"
+// import { userSessionIdPrefix } from "../../constants"
 
 const errorResponse = [
   {
@@ -23,7 +24,11 @@ export const resolvers: IResolverMap = {
     bye2: () => "bye"
   },
   Mutation: {
-    login: async (_, { email, password }: GQL.ILoginOnMutationArguments, { session }) => {
+    login: async (
+      _,
+      { email, password }: GQL.ILoginOnMutationArguments,
+      { session, redis, request }
+    ) => {
       const user = await User.findOne({ where: { email } })
 
       if (!user) {
@@ -36,14 +41,17 @@ export const resolvers: IResolverMap = {
 
       const valid = await bcrypt.compare(password, user.password)
 
-      if (valid && user) {
-        // login successful
-        session.userId = user.id
-
-        return null
+      if (!valid) {
+        return errorResponse
       }
 
-      return errorResponse
+      // login successful
+      session.userId = user.id
+      if (request.sessionID) {
+        await redis.lpush(user.id, request.sessionID)
+      }
+
+      return null
     }
   }
 }
