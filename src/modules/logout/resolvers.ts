@@ -1,5 +1,5 @@
 import IResolverMap from "../../types/graphql-utils"
-// import { userSessionIdPrefix } from "../../constants"
+import { userSessionIdPrefix, redisSessionPrefix } from "../../constants"
 
 export const resolvers: IResolverMap = {
   Query: {
@@ -10,19 +10,17 @@ export const resolvers: IResolverMap = {
       const { userId } = session
 
       if (userId) {
-        const sessionIds = await redis.lrange(userId, 0, -1)
+        const sessionIds = await redis.lrange(`${userSessionIdPrefix}${userId}`, 0, -1)
 
-        console.log(">>>>>>>>>>>>>>>>>>>>> sessionIds")
-        console.log(sessionIds)
-
-        sessionIds.map((i: any) => {
-          console.log(`>>>>>>>>>>>>>>>>>>>>> map  ${i}`)
-          return redis.del(i)
+        const redisPipeline = redis.multi()
+        sessionIds.map((key: string) => {
+          redisPipeline.del(`${redisSessionPrefix}${key}`)
         })
-        const sessionIds2 = await redis.lrange(userId, 0, -1)
-
-        console.log(">>>>>>>>>>>>>>>>>>>>> sessionIds2")
-        console.log(sessionIds2)
+        await redisPipeline.exec(err => {
+          if (err) {
+            console.log(err)
+          }
+        })
 
         return true
       }

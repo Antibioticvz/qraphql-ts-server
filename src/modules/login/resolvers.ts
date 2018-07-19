@@ -3,7 +3,7 @@ import * as bcrypt from "bcryptjs"
 import IResolverMap from "../../types/graphql-utils"
 import { User } from "../../entity/User"
 import { invalidLogin, confirmEmailError } from "./errorMessages"
-// import { userSessionIdPrefix } from "../../constants"
+import { userSessionIdPrefix } from "../../constants"
 
 const errorResponse = [
   {
@@ -48,7 +48,7 @@ export const resolvers: IResolverMap = {
       // login successful
       session.userId = user.id
       if (request.sessionID) {
-        await redis.lpush(user.id, request.sessionID)
+        await redis.lpush(`${userSessionIdPrefix}${user.id}`, request.sessionID)
       }
 
       return null

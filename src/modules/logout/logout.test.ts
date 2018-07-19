@@ -60,7 +60,7 @@ describe("Logout", async () => {
   it("Success: multiple session logged out", async () => {
     await firstSession.logout()
 
-    expect(await firstSession.me()).toBeNull()
-    expect(await secondSession.me()).toBeNull()
+    expect(await firstSession.me()).toEqual({ data: { me: null } })
+    expect(await secondSession.me()).toEqual(await firstSession.me())
   })
 })
