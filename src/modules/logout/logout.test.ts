@@ -2,7 +2,7 @@ import * as Chance from "chance"
 import { User } from "../../entity/User"
 import { createTypeormConn } from "../../utils/createTypeormConn"
 import { Connection } from "typeorm"
-import { TestClient } from "../../utils/TestClient"
+import { TestClient } from "../../utils/testClient"
 
 const firstSession = new TestClient(process.env.TEST_HOST as string)
 const secondSession = new TestClient(process.env.TEST_HOST as string)

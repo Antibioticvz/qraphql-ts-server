@@ -8,7 +8,7 @@ import {
 } from "./errorMessages"
 import { createTypeormConn } from "../../utils/createTypeormConn"
 import { Connection } from "typeorm"
-import { TestClient } from "../../utils/TestClient"
+import { TestClient } from "../../utils/testClient"
 
 const client = new TestClient(process.env.TEST_HOST as string)
 
